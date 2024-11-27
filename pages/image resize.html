@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../Css/common.css">
+    <link rel="stylesheet" href="../Css/style.css">
+    <title>Image Resizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eaeef2;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        form {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        label {
+            font-size: 1.1em;
+            margin-right: 10px;
+        }
+        input[type="file"], input[type="number"] {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #output {
+            margin-top: 20px;
+            display: none;
+        }
+        .image-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 30px;
+            gap: 20px;
+        }
+        .image-container div {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+        }
+        img {
+            max-width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .image-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .image-info {
+            font-size: 0.9em;
+            color: #555;
+        }
+        .download-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        a {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        a:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Resizer</h1>
+        <div class="space"></div>
+        
+        <form id="uploadForm">
+            
+            
+            <label for="uploadImage" class="upload-btn">Choose Image:</label>
+            <input type="file" class="upload " id="uploadImage" accept="image/*" required>
+            <br><br>
+            <label for="width">Width:</label>
+            <input type="number" id="width" placeholder="New Width" required>
+            <label for="height">Height:</label>
+            <input type="number" id="height" placeholder="New Height" required>
+            <br><br>
+            <button type="submit">Resize Image</button>
+        </form>
+
+        <div id="output">
+            <h2>Original and Resized Image</h2>
+            <div class="image-container">
+                <div>
+                    <div class="image-title">Original Image</div>
+                    <img id="originalImage" alt="Original Image">
+                    <p id="originalImageName"></p>
+                    <p class="image-info" id="originalImageSize"></p>
+                </div>
+                <div>
+                    <div class="image-title">Resized Image</div>
+                    <img id="resizedImage" alt="Resized Image">
+                    <p class="image-info" id="resizedImageSize"></p>
+                    <div class="download-container">
+                        <a id="downloadLink" class="hidden">Download Resized Image</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("uploadForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById("uploadImage");
+            const widthInput = document.getElementById("width").value;
+            const heightInput = document.getElementById("height").value;
+
+            if (fileInput.files.length === 0) {
+                alert("Please upload an image.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const img = new Image();
+                img.src = event.target.result;
+
+                // Display the original image
+                const originalImage = document.getElementById("originalImage");
+                originalImage.src = img.src;
+
+                // Display the original image file name
+                const originalImageName = document.getElementById("originalImageName");
+                originalImageName.textContent = "Original File: " + file.name;
+
+                // Calculate and display the original image size in KB
+                const originalImageSize = (file.size / 1024).toFixed(2) + " KB";
+                document.getElementById("originalImageSize").textContent = "Size: " + originalImageSize;
+
+                img.onload = function () {
+                    const canvas = document.createElement("canvas");
+                    const context = canvas.getContext("2d");
+
+                    // Enable high-quality resizing
+                    context.imageSmoothingEnabled = true;
+                    context.imageSmoothingQuality = "high";
+
+                    // Maintain aspect ratio if only one dimension is provided
+                    const aspectRatio = img.width / img.height;
+                    let newWidth = widthInput ? widthInput : img.width;
+                    let newHeight = heightInput ? heightInput : img.height;
+
+                    if (!widthInput && heightInput) {
+                        newWidth = heightInput * aspectRatio;
+                    } else if (!heightInput && widthInput) {
+                        newHeight = widthInput / aspectRatio;
+                    }
+
+                    // Set canvas width and height
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
+
+                    // Draw the resized image on the canvas
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    // Determine the output format (JPEG for non-transparent images, PNG for transparent images)
+                    let outputFormat = file.type === "image/png" ? "image/png" : "image/jpeg";
+                    let resizedImageURL = canvas.toDataURL(outputFormat, 1.0);  // "1.0" ensures maximum image quality
+
+                    // Show the resized image in the output div
+                    const resizedImage = document.getElementById("resizedImage");
+                    resizedImage.src = resizedImageURL;
+
+                    // Provide the download link for the resized image
+                    const downloadLink = document.getElementById("downloadLink");
+                    downloadLink.href = resizedImageURL;
+                    downloadLink.download = "resized-" + file.name;  // Append "resized-" to the file name for the resized image
+                    downloadLink.textContent = "Download Resized Image";
+                    downloadLink.classList.remove("hidden");
+
+                    // Calculate and display the resized image size
+                    const resizedImageSize = (resizedImageURL.length * 0.75 / 1024).toFixed(2) + " KB"; // Base64 string length * 0.75 to estimate size
+                    document.getElementById("resizedImageSize").textContent = "Size: " + resizedImageSize;
+
+                    // Show the output section
+                    document.getElementById("output").style.display = "block";
+                };
+            };
+
+            reader.readAsDataURL(file);
+        });
+    </script>
+</body>
+</html>

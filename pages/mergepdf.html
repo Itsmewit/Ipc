@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merge PDFs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #output {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Merge PDFs</h1>
+        <form id="pdfForm">
+            <input type="file" id="pdfFiles" multiple accept=".pdf">
+            <button type="button" id="mergeButton">Merge PDFs</button>
+        </form>
+        <div id="output"></div>
+    </div>
+
+    <script type="module">
+        import { PDFDocument } from 'https://cdn.skypack.dev/pdf-lib';
+
+        document.getElementById('mergeButton').addEventListener('click', async () => {
+            const inputFiles = document.getElementById('pdfFiles').files;
+            if (inputFiles.length < 2) {
+                alert('Please select at least two PDF files to merge.');
+                return;
+            }
+
+            const mergedPdf = await PDFDocument.create();
+            for (let file of inputFiles) {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(arrayBuffer);
+                const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                pages.forEach(page => mergedPdf.addPage(page));
+            }
+
+            const mergedPdfBytes = await mergedPdf.save();
+            const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = 'merged.pdf';
+            downloadLink.textContent = 'Download Merged PDF';
+            document.getElementById('output').innerHTML = '';
+            document.getElementById('output').appendChild(downloadLink);
+        });
+    </script>
+</body>
+</html>

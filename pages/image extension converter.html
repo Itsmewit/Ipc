@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Image Converter with Effective Download</title>
+    <link rel="stylesheet" href="../Css/common.css">
+    <link rel="stylesheet" href="../Css/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+
+        select, button {
+            padding: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .output-container {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .image-card {
+            display: inline-block;
+            margin: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 200px;
+        }
+
+        .image-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-preview {
+            max-width: 180px;
+            max-height: 180px;
+            display: block;
+            margin: auto;
+            border-radius: 10px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .image-preview:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .info {
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .download-btn {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #0056b3;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enhanced Image Converter with Effective Download</h1>
+        
+        <div class="space"></div>
+        
+        <label for="fileInput" class="upload-btn">Select images</label>
+        
+        <input type="file" id="fileInput" class="upload" accept="image/*" multiple>
+        
+        <div class="space"></div>
+        
+        <select id="formatSelect">
+            <option value="jpeg">JPEG</option>
+            <option value="jpg">JPG</option>
+            <option value="png">PNG</option>
+            <option value="gif">GIF</option>
+            <option value="bmp">BMP</option>
+            <option value="webp">WebP</option>
+            <option value="tiff">TIFF</option>
+        </select>
+        <button id="convertButton">Convert</button>
+
+        <div id="output" class="output-container"></div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const formatSelect = document.getElementById('formatSelect');
+        const convertButton = document.getElementById('convertButton');
+        const output = document.getElementById('output');
+
+        convertButton.addEventListener('click', async () => {
+            const files = fileInput.files;
+            const format = formatSelect.value;
+
+            if (files.length === 0) {
+                alert("Please select an image file!");
+                return;
+            }
+
+            output.innerHTML = '';  // Clear previous output
+
+            const promises = Array.from(files).map(file => convertImage(file, format));
+            const results = await Promise.all(promises);
+
+            results.forEach(({ url, downloadName, size, dimensions }) => {
+                const imageCard = document.createElement('div');
+                imageCard.classList.add('image-card');
+
+                const imagePreview = document.createElement('img');
+                imagePreview.src = url;
+                imagePreview.classList.add('image-preview');
+
+                const info = document.createElement('div');
+                info.classList.add('info');
+                info.textContent = `Extension: .${format} | Size: ${size} | Dimensions: ${dimensions.width}x${dimensions.height}px`;
+
+                const downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                downloadLink.download = downloadName;
+                downloadLink.classList.add('download-btn');
+                downloadLink.textContent = 'Download';
+
+                imageCard.appendChild(imagePreview);
+                imageCard.appendChild(info);
+                imageCard.appendChild(downloadLink);
+                output.appendChild(imageCard);
+            });
+        });
+
+        async function convertImage(file, format) {
+            const url = await loadImage(file);
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = url;
+
+                img.onload = function () {
+                    requestAnimationFrame(() => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+
+                        ctx.drawImage(img, 0, 0);
+
+                        canvas.toBlob((blob) => {
+                            const sizeInKB = blob.size / 1024;
+                            const size = sizeInKB > 1024
+                                ? `${(sizeInKB / 1024).toFixed(2)} MB`
+                                : `${sizeInKB.toFixed(2)} KB`;
+                            const dimensions = { width: img.width, height: img.height };
+                            const url = URL.createObjectURL(blob);
+                            const downloadName = file.name.replace(/\.[^/.]+$/, "") + '.' + format;
+                            resolve({ url, downloadName, size, dimensions });
+                        }, `image/${format}`);
+                    });
+                };
+            });
+        }
+
+        function loadImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+</body>
+</html>

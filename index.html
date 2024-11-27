@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImagePdf Converter</title>
+    <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="css/box.css">
+     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+     
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+</head>
+<body>
+    
+    
+    <nav class="navbar">
+        
+        
+        <div class="logo" style="font-size:30px;">IP Converter</div>
+        
+        <div class="icons">
+                    
+   <img src="images/man.png" class="profileicon"  onclick="toggleprofile()">
+           
+       <img src="images/menu.png" class="profileicon" onclick="toggleMenu()">
+       
+        </div>
+    </nav>
+    
+    
+    <div class="menu-window" id="menuWindow">
+     <ul>
+          <li><a href="index.html">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Policy</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Feedback</a></li>
+             <li><a href="box-section">Image Tools</a></li>
+            <li><a href="#">PDF Tools</a></li>
+        </ul>
+    </div>
+    
+    <div class="menu-window" id="profileWindow">
+     <ul>
+          <li><a href="">Profile</a></li>
+            <li><a href="#">login</a></li>
+            <li><a href="#">sign up</a></li>
+            
+        </ul>
+    </div>
+    
+    
+    <script src="js/script.js"></script> 
+    <div class="space"></div>
+    <div class="space"></div> 
+    
+    <h2 class="heading">Every tool you need to work with PDFs in one place</h2><br>
+    
+    <p>Every tool you need to use PDFs, at your fingertips. All are 100% FREE and easy to use! Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks.</p>
+    
+    <br><br>
+    
+    
+     
+       
+       
+       
+     
+       
+       <!-- Section containing the div boxes -->
+  <section class="box-section">  
+      
+      
+      <a href="pages/image crop.html">
+    <div class="box">
+ <!-- Small logo and heading with description -->
+      <img src="images/cropeimage.png" alt="Logo 1" class="box-logo">
+      <div class="box-content">  
+        <h3>Image Crop</h3>
+        <p>Crop JPG, PNG or GIF by defining a rectangle in pixels.
+Cut your image online.</p>
+      </div>
+    </div>
+    </a>
+    
+    
+    
+    <a href="pages/image compress.html">
+      <div class="box">
+      <img src="logo2.png" alt="Logo 2" class="box-logo">
+      <div class="box-content">
+        <h3>Compress Image</h3>
+        <p>Compress JPG, PNG, SVG or GIF with the best quality and compression.
+Reduce the filesize of your images at once.</p>
+      </div>
+    </div></a>
+    
+    
+  <a href="pages/image resize.html">  <div class="box">
+      <img src="logo3.png" alt="Logo 3" class="box-logo">
+      <div class="box-content">
+        <h3>Resize Image</h3>
+        <p>Resize JPG, PNG, SVG or GIF by defining new height and width pixels.
+Change image dimensions in bulk.</p>
+      </div>
+    </div>
+    </a>
+    
+    
+    <div class="box">
+      <img src="logo4.png" alt="Logo 4" class="box-logo">
+      <div class="box-content">
+        <h3>Convert Image to PNG</h3>
+        <p>Transform PNG, GIF, TIF, PSD, SVG, WEBP, HEIC or RAW to JPG format.
+Convert many images to JPG online at once.</p>
+      </div>
+    </div>
+    
+    
+    
+   <a href="pages/watermark/index.html">
+       <div class="box">
+      <img src=".png" alt="Logo 5" class="box-logo">
+      <div class="box-content">
+        <h3>Watermark Image</h3>
+        <p>Watermark JPG, PNG or GIF images.
+Stamp images or text over your images at once.</p>
+      </div>
+    </div>
+   </a>
+    
+    <a href="pages/imagetopdf.html">
+    <div class="box">
+      <img src="images/img2pdf.png" alt="Logo 6" class="box-logo">
+      <div class="box-content">
+        <h3>Image to PDF</h3>
+    <p>Convert multiple images into a pdf. </p>
+      </div>
+    </div>
+    </a>
+    
+    
+  </section>
+  
+  
+  
+  <!--pdf operations -->
+    
+      <div class="space"></div>
+   <!-- Section containing the div boxes -->
+  <section class="box-section">
+      
+    <div class="box">
+      <img src="images/cropeimage.png" alt="Logo 1" class="box-logo">
+      
+      <div class="box-content">  
+        <h3>Image Crop</h3>
+        <p>Crop JPG, PNG or GIF by defining a rectangle in pixels.
+Cut your image online.</p>
+      </div>
+    </div>
+    
+    
+    
+    
+    <div class="box">
+      <img src="logo2.png" alt="Logo 2" class="box-logo">
+      <div class="box-content">
+        <h3>Compress Image</h3>
+        <p>Compress JPG, PNG, SVG or GIF with the best quality and compression.
+Reduce the filesize of your images at once.</p>
+      </div>
+    </div>
+    
+    
+    <div class="box">
+      <img src="logo3.png" alt="Logo 3" class="box-logo">
+      <div class="box-content">
+        <h3>Resize Image</h3>
+        <p>Resize JPG, PNG, SVG or GIF by defining new height and width pixels.
+Change image dimensions in bulk.</p>
+      </div>
+    </div>
+    
+    
+    
+    <div class="box">
+      <img src="logo4.png" alt="Logo 4" class="box-logo">
+      <div class="box-content">
+        <h3>Convert Image to PNG</h3>
+        <p>Transform PNG, GIF, TIF, PSD, SVG, WEBP, HEIC or RAW to JPG format.
+Convert many images to JPG online at once.</p>
+      </div>
+    </div>
+    
+    
+    
+    <div class="box">
+      <img src="logo5.png" alt="Logo 5" class="box-logo">
+      <div class="box-content">
+        <h3>Watermark Image</h3>
+        <p>Watermark JPG, PNG or GIF images.
+Stamp images or text over your images at once.</p>
+      </div>
+    </div>
+    
+    
+    
+    <div class="box">
+      <img src="logo6.png" alt="Logo 6" class="box-logo">
+      <div class="box-content">
+        <h3>Image to PDF</h3>
+        <p>Convert multiple images into a pdf. </p>
+      </div>
+    </div>
+  </section>
+     
+    
+    
+    <div class="space"></div>
+    
+     <footer>
+  <div class="footer-container">
+    <!-- Tools Section -->
+    <div class="footer-section">
+      <h3>Tools</h3>
+      <ul>
+        <li><a href="#">Tool 1</a></li>
+        <li><a href="#">Tool 2</a></li>
+        <li><a href="#">Tool 3</a></li>
+        <li><a href="#">Tool 4</a></li>
+      </ul>
+    </div>
+    
+      <div class="footer-section">
+      <h3>Tools</h3>
+      <ul>
+        <li><a href="#">Tool 1</a></li>
+        <li><a href="#">Tool 2</a></li>
+        <li><a href="#">Tool 3</a></li>
+        <li><a href="#">Tool 4</a></li>
+      </ul>
+    </div>
+    
+
+    <!-- About Section -->
+    <div class="footer-section">
+      <h3>About</h3>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+    </div>
+
+    <!-- Policy Section -->
+    <div class="footer-section">
+      <h3>Policy</h3>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="footer-section">
+      <h3>Contact</h3>
+      <ul>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Support</a></li>
+      </ul>
+    </div>
+
+    <!-- Social Media Section -->
+    <div class="footer-section  social-center">
+      <h3>Follow Us</h3>
+      <div class="social-media">
+        <a href="#" class="social-icon facebook"></a>
+     <a href="#" class="social-icon twitter"></a>
+        <a href="#" class="social-icon instagram"></a>
+        <a href="#" class="social-icon linkedin"></a>
+      </div>
+    </div>
+  </div>
+  <p>&copy; 2024 Your Company. All rights reserved.</p>
+</footer>
+    
+    
+</body>
+</html>

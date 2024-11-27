@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert Images to A4 PDF with Optional Diagonal Watermark</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    
+   <link rel="stylesheet" href="../Css/style.css">
+   <link rel="stylesheet" href="../Css/common.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        }
+        #pdfDownload {
+            display: none; /* Hide the download button initially */
+            margin-top: 20px;
+            text-decoration: none;
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+        }
+        .toggle-switch {
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .toggle-switch input {
+            display: none;
+        }
+        .toggle-label {
+            width: 60px;
+            height: 30px;
+            background-color: #ccc;
+            border-radius: 15px;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+        .toggle-label::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        input:checked + .toggle-label {
+            background-color: #28a745;
+        }
+        input:checked + .toggle-label::after {
+            transform: translateX(30px);
+        }
+    </style>
+</head>
+<body>
+    <h1>Convert Images to A4 PDF with Optional Diagonal Watermark</h1>
+    
+    <div class="space"></div>
+    
+    <label for="imageInput" class="upload-btn">Upload Images</label>
+    <input type="file" class="upload" id="imageInput" accept="image/*" multiple>
+
+
+<div class="space"></div>
+    <div class="toggle-switch">
+        <input type="checkbox" id="includeWatermark" />
+        <label for="includeWatermark" class="toggle-label"></label>
+        <span>Include Watermark</span>
+    </div>
+
+    <div id="watermarkContainer" style="display: none;">
+        <label for="watermark">Enter Watermark Text:</label>
+        <input type="text" id="watermark" placeholder="Your Watermark Here" />
+    </div>
+
+    <div class="toggle-switch">
+        <input type="checkbox" id="includePageNumber" />
+        <label for="includePageNumber" class="toggle-label"></label>
+        <span>Include Page Number</span>
+    </div>
+
+    <button id="generatePdf" class="button">Generate PDF</button>
+    
+    <br> <br>
+    <button id="refresh"  class="button">Refresh</button>
+    
+    <div class="space"></div>
+    <a id="pdfDownload" class="upload-btn" href="#" download="images.pdf">Download PDF</a>
+
+    <script>
+        // Function to toggle the visibility of the watermark input
+        document.getElementById('includeWatermark').addEventListener('change', function () {
+            const watermarkContainer = document.getElementById('watermarkContainer');
+            watermarkContainer.style.display = this.checked ? 'block' : 'none'; // Show/hide watermark input
+        });
+
+        // Generate PDF button click event
+        document.getElementById('generatePdf').addEventListener('click', async function () {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4", putOnlyUsedFonts: true });
+            const watermarkText = document.getElementById('watermark').value || 'Watermark'; // Get watermark text
+            const includeWatermark = document.getElementById('includeWatermark').checked; // Check if watermark is included
+            const includePageNumber = document.getElementById('includePageNumber').checked; // Check if page number is included
+
+            const files = document.getElementById('imageInput').files;
+            const totalFiles = files.length;
+
+            if (totalFiles === 0) {
+                alert("Please select at least one image.");
+                return;
+            }
+
+            for (let i = 0; i < totalFiles; i++) {
+                const file = files[i];
+                const imgData = await readFile(file);
+                pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297); // Fit to A4 size
+
+                // Add watermark if checked
+                if (includeWatermark) {
+                    pdf.setTextColor(220); // Set watermark color to a lighter shade
+                    pdf.setFontSize(20); // Set font size for watermark
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const opacity = 0.3;
+                    pdf.setGState(new window.jspdf.GState({ opacity }));
+
+                    // Draw the watermark in a repeating diagonal pattern
+                    const spacing = 60; // Distance between watermarks
+                    for (let x = -50; x < pageWidth; x += spacing) {
+                        for (let y = 50; y < pageHeight; y += spacing) {
+                            pdf.text(watermarkText, x, y, { align: 'center', angle: -45 }); // Rotate text for diagonal effect
+                        }
+                    }
+                }
+
+                // Add page number at the bottom center if checked
+                if (includePageNumber) {
+                    const pageNumber = i + 1; // Pages start at 1
+                    pdf.setFontSize(12);
+                    pdf.text(`Page ${pageNumber}`, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 10, { align: 'center' });
+                }
+
+                // If not the last image, add a new page
+                if (i < totalFiles - 1) {
+                    pdf.addPage();
+                }
+            }
+
+            // Save the PDF to a Blob
+            const pdfBlob = pdf.output('blob');
+            const url = URL.createObjectURL(pdfBlob);
+            const downloadLink = document.getElementById('pdfDownload');
+            downloadLink.href = url;
+            downloadLink.style.display = 'block'; // Show download button
+        });
+
+        // Function to read file as Data URL
+        function readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    resolve(event.target.result);
+                };
+                reader.onerror = function () {
+                    reject(new Error("File reading error"));
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Refresh button click event
+        document.getElementById('refresh').addEventListener('click', function () {
+            document.getElementById('imageInput').value = ''; // Clear file input
+            document.getElementById('pdfDownload').style.display = 'none'; // Hide download link
+            document.getElementById('watermark').value = ''; // Clear watermark input
+            document.getElementById('includeWatermark').checked = false; // Reset watermark checkbox to off
+            document.getElementById('includePageNumber').checked = false; // Reset page number checkbox to off
+            document.getElementById('watermarkContainer').style.display = 'none'; // Reset watermark text input visibility
+        });
+    </script>
+</body>
+</html>

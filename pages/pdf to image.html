@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Image Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #canvasContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .canvas-wrapper {
+            position: relative;
+            margin: 10px;
+        }
+        .canvas {
+            border: 1px solid #ddd;
+            max-width: 200px; /* Set max width for smaller images */
+            max-height: 200px; /* Set max height for smaller images */
+            width: auto;
+            height: auto;
+            transition: transform 0.2s;
+        }
+        .canvas:hover {
+            transform: scale(1.05); /* Slightly enlarge the image on hover */
+            border-color: #007BFF; /* Change border color on hover */
+        }
+        .downloadLink {
+            display: block;
+            text-align: center;
+            margin-top: 5px;
+            color: white;
+            background-color: #007BFF;
+            padding: 8px 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .downloadLink:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            transform: translateY(-2px); /* Lift effect on hover */
+        }
+        #convertButton, #zipButton {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            margin: 10px;
+        }
+        #convertButton:hover, #zipButton:hover {
+            background-color: #218838; /* Darker green on hover */
+            transform: translateY(-2px); /* Lift effect on hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF to Image Converter</h1>
+    <input type="file" id="fileInput" accept="application/pdf">
+    <button id="convertButton">Convert to Images</button>
+    <button id="zipButton" style="display:none;">Download All as ZIP</button>
+    <div id="canvasContainer"></div>
+
+    <script>
+        let zip = new JSZip();
+        let zipFileName = 'images.zip'; // Default zip file name
+        let imageCount = 0; // Count of images to track the download button visibility
+
+        document.getElementById('convertButton').addEventListener('click', async () => {
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files.length === 0) {
+                alert('Please select a PDF file.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const fileReader = new FileReader();
+            fileReader.onload = async function () {
+                const pdfData = new Uint8Array(this.result);
+                const pdf = await pdfjsLib.getDocument(pdfData).promise;
+
+                // Clear any existing canvases and reset zip
+                const canvasContainer = document.getElementById('canvasContainer');
+                canvasContainer.innerHTML = '';
+                zip = new JSZip();
+                imageCount = 0;
+
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const scale = 0.5; // Adjust scale for smaller images
+                    const viewport = page.getViewport({ scale });
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.className = 'canvas';
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    // Render PDF page into canvas context
+                    await page.render({ canvasContext: context, viewport }).promise;
+
+                    // Create a wrapper for each canvas and download link
+                    const canvasWrapper = document.createElement('div');
+                    canvasWrapper.className = 'canvas-wrapper';
+
+                    // Add canvas to the wrapper
+                    canvasWrapper.appendChild(canvas);
+
+                    // Create a download link for each image
+                    const imgData = canvas.toDataURL('image/png');
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = imgData;
+                    downloadLink.download = `converted_image_page_${pageNum}.png`;
+                    downloadLink.innerText = `Download Page ${pageNum}`;
+                    downloadLink.className = 'downloadLink';
+                    
+                    // Add download link to the wrapper
+                    canvasWrapper.appendChild(downloadLink);
+
+                    // Add wrapper to the container
+                    canvasContainer.appendChild(canvasWrapper);
+
+                    // Add image data to zip
+                    const imgBlob = await fetch(imgData).then(res => res.blob());
+                    zip.file(`converted_image_page_${pageNum}.png`, imgBlob);
+
+                    imageCount++;
+                }
+
+                // Show the ZIP download button if images are created
+                const zipButton = document.getElementById('zipButton');
+                if (imageCount > 0) {
+                    zipButton.style.display = 'inline';
+                }
+            };
+
+            fileReader.readAsArrayBuffer(file);
+        });
+
+        document.getElementById('zipButton').addEventListener('click', async () => {
+            const content = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = zipFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url); // Clean up the URL object
+        });
+    </script>
+</body>
+</html>

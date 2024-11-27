@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Cropper</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Cropper.js CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../css/common.css">
+ 
+</head>
+<body>
+    
+     <script>
+    window.onload = function() {
+      fetch('files/nav.html') // Fetch the content.html file
+        .then(response => response.text()) // Get the text content of the file
+        .then(data => {
+          document.getElementById('nav').innerHTML = data; // Inject content into the div
+        })
+        .catch(error => console.error('Error loading the HTML file:', error));
+    };
+  </script>
+  
+  <div id="nav"></div>
+    
+    
+    
+    
+  <div class="container mt-5">
+    <h2 class="text-center">Image Cropper</h2>
+    <div class="row">
+        
+      <div class="col-md-8">
+          
+   <input type="file" id="upload image" class="form-control mb-3">
+        
+        <div class="img-container">
+          <img id="image" src="" alt="Picture" style="display:none;">
+        </div>
+      </div>
+      <div class="col-md-4 preview-container">
+        <div class="img-preview"></div>
+        <button id="cropButton" class="button">Crop & Download</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <!-- Cropper.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      var cropper;
+      var image = document.getElementById('image');
+      var inputImage = document.getElementById('inputImage');
+      var cropButton = document.getElementById('cropButton');
+
+      inputImage.addEventListener('change', function(event) {
+        var files = event.target.files;
+        var done = function(url) {
+          inputImage.value = '';
+          image.src = url;
+          image.style.display = 'block';
+          if (cropper) {
+            cropper.destroy();
+          }
+          cropper = new Cropper(image, {
+            aspectRatio: 1,
+            viewMode: 1,
+            preview: '.img-preview'
+          });
+        };
+        var reader;
+        var file;
+        if (files && files.length > 0) {
+          file = files[0];
+          if (URL) {
+            done(URL.createObjectURL(file));
+          } else if (FileReader) {
+            reader = new FileReader();
+            reader.onload = function(e) {
+              done(reader.result);
+            };
+            reader.readAsDataURL(file);
+          }
+        }
+      });
+
+      cropButton.addEventListener('click', function() {
+        var croppedCanvas;
+        var croppedImage;
+        if (cropper) {
+          croppedCanvas = cropper.getCroppedCanvas();
+          croppedImage = croppedCanvas.toDataURL('image/png');
+          var link = document.createElement('a');
+          link.href = croppedImage;
+          link.download = 'cropped-image.png';
+          link.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

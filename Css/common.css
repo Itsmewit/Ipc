@@ -1,0 +1,58 @@
+  .button {
+            background-color:#86cae6ef; /* Green */
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 20px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        
+        
+        
+ /* General upload button styling */
+          .upload-btn {
+            background-color: #4285f4;
+            color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            text-align: center;
+        }
+        .file-input,.upload{
+            display: none;
+        }
+        
+        
+        
+
+ /* Custom styles */
+    .img-container {
+      max-width: 100%;
+      max-height: 400px;
+      margin-bottom: 20px;
+    }
+    .img-preview {
+      overflow: hidden;
+      width: 160px;
+      height: 160px;
+      margin: 10px;
+      border: 1px solid black;
+    }
+    .preview-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
